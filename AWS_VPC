@@ -1,0 +1,60 @@
+## TERRAFORM_VPC
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+      
+    }
+  }
+}
+
+provider "aws" {
+  region = "ap-south-2"
+}
+
+resource "aws_vpc" "SOHAM-VPC" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "SOHAM-VPC"
+  }
+}
+
+resource "aws_subnet" "SOHAM_Public" {
+  vpc_id     = aws_vpc.SOHAM-VPC.id
+  cidr_block = "10.0.0.0/24"
+  tags = {
+    Name = "SOHAM_Public"
+  }
+}
+
+
+resource "aws_subnet" "SOHAM_Private" {
+  vpc_id     = aws_vpc.SOHAM-VPC.id
+  cidr_block = "10.0.1.0/24"
+  tags = {
+    Name = "SOHAM_Private"
+  }
+}
+
+resource "aws_internet_gateway" "TEST_IG" {
+  vpc_id = aws_vpc.SOHAM-VPC.id
+  tags = {
+    Name = "TEST_IG"
+  }
+
+}
+
+
+resource "aws_route_table" "SOHAM_Public_RT" {
+  vpc_id = aws_vpc.SOHAM-VPC.id
+  tags = {
+    Name = "SOHAM_Public_RT"
+  }
+}
+
+resource "aws_route_table_association" "SOHAM_Public_RT" {
+  subnet_id      = aws_subnet.SOHAM_Public.id
+  route_table_id = aws_route_table.SOHAM_Public_RT.id
+}
